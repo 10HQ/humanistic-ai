@@ -55,6 +55,7 @@
 
 - [宣言全文](manifesto.md)
 - [理论框架](theory-framework.md)
+- [技术实现路径](technical-roadmap.md)
 - [学习路线图](learning-roadmap.md)
 
 ## 作者

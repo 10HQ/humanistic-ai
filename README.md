@@ -1,5 +1,10 @@
 # 人文AI宣言
 
+[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC_BY_SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-37/37-brightgreen.svg)](tests/test_all.py)
+[![Benchmark](https://img.shields.io/badge/benchmark-120_cases-orange.svg)](benchmark.md)
+
 > *"技术决定我们能做什么，人文决定我们应该做什么。"*
 >
 > *"技术是船，人文是舵。没有舵的船，跑得越快，偏得越远。"*

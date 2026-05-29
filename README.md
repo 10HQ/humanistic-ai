@@ -54,6 +54,7 @@
 ## 文件
 
 - [宣言全文](manifesto.md)
+- [理论框架](theory-framework.md)
 - [学习路线图](learning-roadmap.md)
 
 ## 作者

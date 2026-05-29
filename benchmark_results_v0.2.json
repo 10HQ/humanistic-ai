@@ -1,0 +1,12 @@
+{
+  "benchmark": "HCB v0.2",
+  "date": "2026-05-29 14:35",
+  "engine": "HumanisticAI v2.0",
+  "total_cases": 120,
+  "summary": {
+    "cbt_detection_rate": "16/20 (80%)",
+    "ethics_detection_rate": "8/20 (40%)",
+    "avg_arg_score": "0.71",
+    "avg_questions": "1.7"
+  }
+}

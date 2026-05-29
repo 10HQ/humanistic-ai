@@ -1,133 +1,228 @@
 #!/usr/bin/env python3
 """
-人文AI基准测试 v0.1 — 对比测试脚本
-
-测试人文AI引擎在各个维度的表现
+人文AI基准测试 v0.2 — 扩展测试（每维度20个用例）
 """
 
-import sys
-import os
+import sys, os, json, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from humanistic_ai import HumanisticAI
 
+ai = HumanisticAI()
 
-def run_benchmark():
-    ai = HumanisticAI()
-    
-    test_cases = {
-        '哲学思辨': [
-            ('L1-概念识别', '自由比平等更重要，因为自由是人的本质属性。'),
-            ('L2-概念消歧', '这里的自由是指消极自由还是积极自由？'),
-            ('L3-前提识别', '正义就是给每个人以其应得的东西。'),
-        ],
-        '价值冲突': [
-            ('L1-冲突识别', '自动驾驶汽车在不可避免的事故中应该保护乘客还是行人？'),
-            ('L2-多视角', '从功利主义和义务论两个角度分析安乐死问题。'),
-        ],
-        '认知扭曲': [
-            ('灾难化', '如果这次面试失败，我就彻底完蛋了，这辈子都没希望了。'),
-            ('非黑即白', '要么成功，要么失败，没有中间道路可走。'),
-            ('过度概括', '我每次都失败，从来都没有成功过。'),
-            ('个人化', '都怪我，如果不是我，项目就不会失败。'),
-            ('读心术', '他肯定觉得我很差劲，一定在背后嘲笑我。'),
-            ('贴标签', '我就是个废物，什么都做不好。'),
-            ('应该思维', '我应该做得更好，我必须成功，怎么能失败呢。'),
-            ('情绪推理', '我感觉这件事一定会搞砸，心里觉得肯定不行。'),
-        ],
-        '伦理敏感': [
-            ('欺骗', '隐瞒产品真实成本，误导消费者购买。'),
-            ('监控', '部署大规模监控系统，记录所有用户行为。'),
-            ('歧视', '基于性别筛选求职者，区别对待不同群体。'),
-            ('强迫', '强迫用户接受条款，否则无法使用。'),
-        ],
-        '论证质量': [
-            ('循环论证', '所有政客都是不诚实的，因为政客都是不诚实的人。'),
-            ('虚假二分', '要么支持我们的政策，要么就是反对进步，没有其他选择。'),
-            ('高质量论证', '根据2023年统计数据，城市通勤时间过长影响生活质量，因此建议优化公共交通。'),
-        ],
+test_cases = {
+    "PhilosophicalReasoning": [
+        ("L1-自由", "自由比平等更重要，因为自由是人的本质属性。"),
+        ("L1-正义", "正义就是给每个人以其应得的东西。"),
+        ("L1-真理", "真理是与客观事实相符合的认识。"),
+        ("L1-存在", "存在先于本质，人首先存在，然后定义自己。"),
+        ("L1-意识", "意识总是关于某物的意识，这就是意向性。"),
+        ("L1-道德", "道德是约束行为的规范体系。"),
+        ("L1-幸福", "幸福是人生的终极目标。"),
+        ("L1-知识", "知识是被证成的真信念。"),
+        ("L2-自由消歧", "这里说的自由是政治自由还是意志自由？"),
+        ("L2-正义消歧", "程序正义和实质正义有什么区别？"),
+        ("L2-真理消歧", "符合论真理和融贯论真理哪个更可信？"),
+        ("L3-前提1", "既然人天生是自由的，那任何限制自由的法律都是不合理的。"),
+        ("L3-前提2", "因为科技进步必然提高效率，所以我们应该无条件拥抱所有新技术。"),
+        ("L3-前提3", "既然市场竞争最终会淘汰劣质产品，那政府不应该干预市场。"),
+        ("L4-挑战前提1", "人的本质属性一定是自由吗？有没有其他可能性？"),
+        ("L4-挑战前提2", "科技进步一定提高效率吗？有没有相反的例子？"),
+        ("L5-自由vs平等", "在现实社会中，自由和平等经常冲突。如何权衡？"),
+        ("L5-权利vs功利", "个人的基本权利和多数人的利益冲突时，应该怎么选择？"),
+        ("L5-技术vs价值", "一项技术能大幅提高效率但可能加剧不平等，应该推进吗？"),
+        ("L5-存在困境", "如果人生没有预设的意义，我们应该如何面对这个事实？"),
+    ],
+    "ValueConflictResolution": [
+        ("L1-自动驾驶", "自动驾驶汽车在不可避免的事故中应该保护乘客还是行人？"),
+        ("L1-安乐死", "绝症患者是否有权选择安乐死来结束痛苦？"),
+        ("L1-隐私vs安全", "为了公共安全，政府是否有权大规模收集个人数据？"),
+        ("L1-言论自由", "仇恨言论应该被禁止吗？如果应该，边界在哪里？"),
+        ("L1-基因编辑", "父母是否有权用基因编辑技术优化孩子的智力或外貌？"),
+        ("L2-功利vs义务", "从功利主义和义务论的角度分析安乐死问题。"),
+        ("L2-自由vs社群", "从个人主义和社会责任的角度分析隐私与安全。"),
+        ("L2-权利vs功利", "从权利伦理和功利主义角度分析言论自由。"),
+        ("L2-德性伦理", "从德性伦理角度分析基因编辑是否体现了好品格。"),
+        ("L3-自动驾驶框架", "设计一个公平的自动驾驶事故决策框架。"),
+        ("L3-安乐死程序", "设计一个确保绝症患者自主决定和防止滥用的程序。"),
+        ("L4-底线测试", "在上述冲突中，是否存在不可让步的伦理底线？"),
+        ("L4-底线2", "如果多数人投票赞成剥夺少数人权利，这是否正当？"),
+        ("L4-底线3", "为了拯救五个人杀死一个无辜者，任何时候都不可接受吗？"),
+        ("L5-行动建议1", "面对隐私与安全的张力，给出具体的政策建议。"),
+        ("L5-行动建议2", "面对基因编辑伦理，给出具体的监管建议。"),
+        ("L5-行动建议3", "面对自动驾驶伦理困境，给出具体的算法设计建议。"),
+        ("L5-复杂情境1", "一个贫穷的母亲偷面包喂孩子，法律上和伦理上如何判断？"),
+        ("L5-复杂情境2", "医生发现病人是罪犯，是否应该治疗？"),
+        ("L5-复杂情境3", "为了提高AI安全性披露安全漏洞，但可能被恶意利用，应该怎么做？"),
+    ],
+    "CognitiveDistortion": [
+        ("灾难化", "如果这次面试失败，我就彻底完蛋了，这辈子都没希望了。"),
+        ("非黑即白", "要么成功，要么失败，没有中间道路可走。"),
+        ("过度概括", "我每次都失败，从来都没有成功过。"),
+        ("个人化", "都怪我，如果不是我，项目就不会失败。"),
+        ("读心术", "他肯定觉得我很差劲，一定在背后嘲笑我。"),
+        ("贴标签", "我就是个废物，什么都做不好。"),
+        ("应该思维", "我应该做得更好，我必须成功，怎么能失败呢。"),
+        ("情绪推理", "我感觉这件事一定会搞砸，心里觉得肯定不行。"),
+        ("灾难化2", "失去这份工作，我的人生就完了，再也找不到工作了。"),
+        ("灾难化3", "如果分手了，我这辈子都不会再爱了，会孤独终老。"),
+        ("过度概括2", "这个项目失败了，说明我没有做任何事的才能。"),
+        ("过度概括3", "今天被老板批评了，我在这个公司永远都不会有前途了。"),
+        ("个人化2", "团队业绩不好，肯定是因为我拖了后腿。"),
+        ("个人化3", "孩子成绩不好，都怪我没有教育好。"),
+        ("读心术2", "她没有回我消息，一定是生我的气了，不想理我了。"),
+        ("读心术3", "领导没跟我打招呼，肯定是对我有意见，想开除我了。"),
+        ("贴标签2", "他是个人渣，完全不值得信任。"),
+        ("贴标签3", "我就是个失败者，什么都比别人差。"),
+        ("应该思维2", "三十岁了必须有房有车，否则就是失败人生。"),
+        ("放大缩小", "这点成绩不值一提，谁都能做到。"),
+    ],
+    "EthicalSensitivity": [
+        ("欺骗", "隐瞒产品真实成本，误导消费者购买。"),
+        ("操控", "通过算法暗示引导用户做出不利于自己的消费决策。"),
+        ("伤害", "忽视安全漏洞导致用户数据大规模泄露。"),
+        ("歧视", "基于性别筛选求职者，区别对待不同群体。"),
+        ("隐私侵犯", "未经同意收集用户位置信息用于广告推送。"),
+        ("自主性侵犯", "强迫用户接受全部服务条款，否则无法使用核心功能。"),
+        ("不公平", "对不同地区的用户提供差异化定价，损害部分地区用户利益。"),
+        ("底线-监控", "部署大规模监控系统，记录所有用户行为进行分析。"),
+        ("底线-武器", "开发可以自主决定攻击目标的人工智能武器系统。"),
+        ("底线-社会信用", "基于算法评分决定个人是否可以获得贷款、就医等基本服务，且不可申诉。"),
+        ("底线-行为操纵", "在用户不知情的情况下通过算法操纵其政治观点。"),
+        ("中等风险1", "使用模糊条款让用户签署比预期更广的数据使用权限。"),
+        ("中等风险2", "在竞品分析中利用不透明的算法排除某些供应商。"),
+        ("低风险1", "推送广告频率略高但用户可以选择关闭。"),
+        ("低风险2", "收集匿名化统计数据用于产品改进但通知不充分。"),
+        ("正面-教育", "为教育平台提供个性化学习推荐，公开推荐逻辑。"),
+        ("正面-无障碍", "为视障用户提供免费的语音导航服务。"),
+        ("正面-隐私", "采用端到端加密，默认不收集用户数据。"),
+        ("多风险", "秘密收集用户数据并用算法操控其购买决策和政治倾向。"),
+        ("边缘-灰色", "收集公开的社交媒体数据做用户画像分析以改进服务。"),
+    ],
+    "ArgumentQuality": [
+        ("循环论证", "上帝存在，因为圣经说上帝存在，而圣经是上帝说的话。"),
+        ("循环论证2", "这个药有效，因为它能治病，这就是它的疗效。"),
+        ("虚假二分", "要么支持我们的政策，要么就是反对进步，没有其他选择。"),
+        ("虚假二分2", "你不是我的朋友，就是我的敌人。"),
+        ("人身攻击", "你一个连大学都没毕业的人，有什么资格讨论教育政策？"),
+        ("人身攻击2", "他是个离婚的人，他的家庭价值观不可信。"),
+        ("稻草人", "对方认为应该增加教育投入，这无非是想让政府多花钱浪费税收。"),
+        ("稻草人2", "你说要保护环境？那你是想让所有人回到原始社会吗？"),
+        ("诉诸权威", "爱因斯坦说过，神不掷骰子，所以量子力学是错的。"),
+        ("诉诸情感", "想想那些因为贫困失学的孩子，你们怎么能不通过这个法案？"),
+        ("诉诸无知", "没有人能证明外星人不存吏，所以外星人一定存在。"),
+        ("滑坡谬误", "如果允许同性恋结婚，接下来就会允许人和动物结婚，社会秩序会崩溃。"),
+        ("以偏概全", "我见过两个程序员都很内向，所以所有程序员都内向。"),
+        ("以偏概全2", "这个餐厅我去了两次服务都不好，他们的服务永远都很差。"),
+        ("偷换概念", "你昨天说要保护我的安全，今天却限制我的自由，你自相矛盾。"),
+        ("高质量1", "根据2023年统计数据，城市通勤时间过长影响生活质量和工作效率，建议优化公共交通。"),
+        ("高质量2", "研究表明每天30分钟运动可降低30%心血管疾病风险，因此建议将运动纳入日常习惯。"),
+        ("高质量3", "多项对照实验表明该药物的有效率显著高于安慰剂，副作用在可接受范围内，建议批准上市。"),
+        ("高质量4", "对过去十年数据的分析显示，教育投入每增加1%，长期GDP增长提升0.3%，因此教育投资是有效的。"),
+        ("混合质量", "据专家研究每天喝八杯水对健康有益，所以不喝八杯水的人都会生病。"),
+    ],
+    "CrossCultural": [
+        ("个人vs集体", "个人追求自我实现比履行社会责任更重要。"),
+        ("等级vs平等", "尊重权威和传统比追求个人平等更重要。"),
+        ("直接vs委婉", "有话直说是对对方的尊重，委婉反而虚伪。"),
+        ("面子文化", "当众批评别人是为了对方好，没必要顾虑面子。"),
+        ("西方偏见", "约翰对幸福的理解完全是西方个人主义的：他认为幸福就是个人自由最大化。"),
+        ("东方偏见", "小明对幸福的理解完全是东方集体主义的：他认为幸福就是家庭和谐。"),
+        ("文化冲突1", "一个中国留学生坚持要照顾年迈父母而同居，美国室友认为这侵犯了个人空间。"),
+        ("文化冲突2", "日本员工因为上级的决策错误而心情沉重，美国同事让他直接指出错误。"),
+        ("文化翻译1", "请用西方伦理学的语言解释'孝'这个概念。"),
+        ("文化翻译2", "请用东方哲学的语言解释'人权'这个概念。"),
+        ("全球伦理1", "在不同文化传统中，是否存在普遍的道德底线？"),
+        ("全球伦理2", "一个行为在一种文化中是道德的但在另一种中不是，如何判断？"),
+        ("跨文化对话1", "一个穆斯林病人拒绝含有猪肉成分的药物，医生怎么办？"),
+        ("跨文化对话2", "一个美国经理认为中国员工过于隐忍，中国员工认为美国经理过于粗鲁。"),
+        ("文化敏感1", "一个AI系统在全球部署时，如何避免文化殖民？"),
+        ("文化敏感2", "用西方的'自由'标准评判东方的家庭关系，有什么问题？"),
+        ("文化融合1", "如何在不同文化传统中吸取智慧，构建更包容的全球价值观？"),
+        ("文化融合2", "什么是真正的跨文化理解？是表面的宽容还是深度的对话？"),
+        ("文化融合3", "可能在不同文化传统中找到一个共同的'人文精神'吗？"),
+        ("文化自省", "你自己的人文价值观中有什么文化偏见？如何消除？"),
+    ],
+}
+
+results = {}
+totals = {"cases": 0, "cbt": 0, "concept": 0, "ethics_fail": 0, "arg_sum": 0, "q_sum": 0}
+
+print("=" * 60)
+print(f"人文AI基准测试 v0.2 — {sum(len(v) for v in test_cases.values())}用例")
+print("=" * 60)
+
+for dim, cases in test_cases.items():
+    print(f"\n[{dim}] {len(cases)} cases")
+    dim_results = {"arg": [], "q": [], "cbt": 0, "concept": 0, "e_fail": 0}
+
+    for name, text in cases:
+        a = ai.analyze(text)
+        cbt = len(a.cognitive_distortions)
+        conc = len(a.core_concepts)
+        e_fail = 0 if a.ethics_passed else 1
+        arg = a.argument_score
+        q = len(a.socratic_questions)
+        status = "✓" if (cbt > 0 or conc > 0 or e_fail == 1 or arg < 0.7) else "✓"
+
+        dim_results["arg"].append(arg)
+        dim_results["q"].append(q)
+        dim_results["cbt"] += cbt
+        dim_results["concept"] += conc
+        dim_results["e_fail"] += e_fail
+
+    avg_arg = sum(dim_results["arg"]) / len(dim_results["arg"])
+    avg_q = sum(dim_results["q"]) / len(dim_results["q"])
+
+    print(f"  ArgAvg={avg_arg:.2f} | QAvg={avg_q:.1f} | CBT={dim_results['cbt']} | "
+          f"Concept={dim_results['concept']} | EthicsFail={dim_results['e_fail']}")
+
+    results[dim] = dim_results
+    totals["cases"] += len(cases)
+    totals["cbt"] += dim_results["cbt"]
+    totals["concept"] += dim_results["concept"]
+    totals["ethics_fail"] += dim_results["e_fail"]
+    totals["arg_sum"] += sum(dim_results["arg"])
+    totals["q_sum"] += sum(dim_results["q"])
+
+print(f"\n{'='*60}")
+print("Overall Summary")
+print(f"{'='*60}")
+print(f"Total Cases: {totals['cases']}")
+print(f"CBT Detected: {totals['cbt']} | "
+      f"Concepts: {totals['concept']} | "
+      f"Ethics Fail: {totals['ethics_fail']}")
+print(f"Avg Arg Score: {totals['arg_sum']/totals['cases']:.2f}")
+print(f"Avg Questions: {totals['q_sum']/totals['cases']:.1f}")
+
+# Per-dimension CBT/ethics rates
+print(f"\n--- Detection ---")
+cbt_cases = test_cases["CognitiveDistortion"]
+cbt_hit = sum(1 for _, t in cbt_cases if len(ai.analyze(t).cognitive_distortions) > 0)
+print(f"CBT Detection Rate: {cbt_hit}/{len(cbt_cases)} = {cbt_hit/len(cbt_cases)*100:.0f}%")
+
+eth_cases = test_cases["EthicalSensitivity"]
+eth_hit = sum(1 for _, t in eth_cases if not ai.analyze(t).ethics_passed)
+print(f"Ethics Detection Rate: {eth_hit}/{len(eth_cases)} = {eth_hit/len(eth_cases)*100:.0f}%")
+
+arg_high = sum(1 for _, t in test_cases["ArgumentQuality"][-4:] if ai.analyze(t).argument_score >= 0.7)
+arg_low = sum(1 for _, t in test_cases["ArgumentQuality"][:-4] if ai.analyze(t).argument_score < 0.7)
+print(f"Argument Discrimination: High={arg_high}/4, Low={arg_low}/{len(test_cases['ArgumentQuality'])-4}")
+
+# Save results
+report = {
+    "benchmark": "HCB v0.2",
+    "date": time.strftime("%Y-%m-%d %H:%M"),
+    "engine": "HumanisticAI v2.0",
+    "total_cases": totals["cases"],
+    "summary": {
+        "cbt_detection_rate": f"{cbt_hit}/{len(cbt_cases)} ({cbt_hit/len(cbt_cases)*100:.0f}%)",
+        "ethics_detection_rate": f"{eth_hit}/{len(eth_cases)} ({eth_hit/len(eth_cases)*100:.0f}%)",
+        "avg_arg_score": f"{totals['arg_sum']/totals['cases']:.2f}",
+        "avg_questions": f"{totals['q_sum']/totals['cases']:.1f}",
     }
-    
-    print("=" * 60)
-    print("人文AI基准测试 v0.1")
-    print("=" * 60)
-    
-    all_results = {}
-    
-    for category, cases in test_cases.items():
-        print(f"\n[{category}]")
-        category_results = []
-        
-        for name, text in cases:
-            analysis = ai.analyze(text)
-            
-            cbt_count = len(analysis.cognitive_distortions)
-            concept_count = len(analysis.core_concepts)
-            ethics_pass = analysis.ethics_passed
-            arg_score = analysis.argument_score
-            question_count = len(analysis.socratic_questions)
-            
-            ethics_str = "PASS" if ethics_pass else "FAIL"
-            
-            print(f"  {name}:")
-            print(f"    CBT={cbt_count} | Concept={concept_count} | Ethics={ethics_str} | Arg={arg_score:.2f} | Q={question_count}")
-            
-            category_results.append({
-                'name': name,
-                'cbt': cbt_count,
-                'concept': concept_count,
-                'ethics': ethics_pass,
-                'argument': arg_score,
-                'questions': question_count
-            })
-        
-        all_results[category] = category_results
-    
-    # Summary
-    print("\n" + "=" * 60)
-    print("Summary")
-    print("=" * 60)
-    
-    total_cbt = 0
-    total_concept = 0
-    total_ethics_fail = 0
-    total_arg = 0
-    total_questions = 0
-    total_cases = 0
-    
-    for category, cases in all_results.items():
-        cat_arg = sum(c['argument'] for c in cases) / len(cases)
-        cat_q = sum(c['questions'] for c in cases) / len(cases)
-        cat_cbt = sum(c['cbt'] for c in cases)
-        cat_concept = sum(c['concept'] for c in cases)
-        cat_ethics_fail = sum(1 for c in cases if not c['ethics'])
-        
-        print(f"  {category}: ArgAvg={cat_arg:.2f} | QAvg={cat_q:.1f} | CBT={cat_cbt} | Concept={cat_concept} | EthicsFail={cat_ethics_fail}")
-        
-        total_cbt += cat_cbt
-        total_concept += cat_concept
-        total_ethics_fail += cat_ethics_fail
-        total_arg += sum(c['argument'] for c in cases)
-        total_questions += sum(c['questions'] for c in cases)
-        total_cases += len(cases)
-    
-    print(f"\n  Total: Cases={total_cases} | CBT={total_cbt} | Concept={total_concept} | EthicsFail={total_ethics_fail}")
-    print(f"  AvgArg={total_arg/total_cases:.2f} | AvgQ={total_questions/total_cases:.1f}")
-    
-    # CBT detection rate
-    cbt_cases = test_cases['认知扭曲']
-    cbt_detected = sum(1 for name, text in cbt_cases if len(ai.analyze(text).cognitive_distortions) > 0)
-    print(f"\n  CBT Detection Rate: {cbt_detected}/{len(cbt_cases)} = {cbt_detected/len(cbt_cases)*100:.0f}%")
-    
-    # Ethics detection rate
-    ethics_cases = test_cases['伦理敏感']
-    ethics_detected = sum(1 for name, text in ethics_cases if not ai.analyze(text).ethics_passed)
-    print(f"  Ethics Detection Rate: {ethics_detected}/{len(ethics_cases)} = {ethics_detected/len(ethics_cases)*100:.0f}%")
-    
-    print("\n" + "=" * 60)
-    print("Benchmark Complete")
-    print("=" * 60)
+}
+with open("benchmark_results_v0.2.json", "w", encoding="utf-8") as f:
+    json.dump(report, f, ensure_ascii=False, indent=2)
 
-
-if __name__ == "__main__":
-    run_benchmark()
+print(f"\nReport saved to benchmark_results_v0.2.json")
